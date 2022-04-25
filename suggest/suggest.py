@@ -85,7 +85,7 @@ class Suggest(commands.Cog):
                                 discord.utils.get(message.guild.emojis, id=r)
                             )
                             await asyncio.sleep(0.1)
-                    await ctx.message.add_reaction("\N{WHITE HEAVY CHECK MARK}")
+                    await ctx.send("Successfully submitted suggestion", delete_after=30sec)
         else:
             await ctx.send(
                 embed=discord.Embed(
@@ -182,7 +182,7 @@ class Suggest(commands.Cog):
             if not isinstance(channel, discord.TextChannel):
                 continue
             try:
-                s_message = await channel.fetch_message(suggestion["message_id"])
+                s_message = await ctx.fetch_message(suggestion["message_id"])
             except discord.NotFound:
                 continue
         if not s_message:
@@ -214,6 +214,68 @@ class Suggest(commands.Cog):
         votes = ""
         for reaction in s_message.reactions:
             votes += f"{reaction.emoji} **- {reaction.count - 1 if reaction.me else reaction.count}**\n"
+        if votes:
+            embed.add_field(name="Votes", value=votes, inline=False)
+        await s_message.edit(embed=embed)
+        await s_message.clear_reactions()
+
+    @commands.command()
+    @checks.has_permissions(PermissionLevel.ADMIN)
+    async def consider(self, ctx, suggestion_id: int, *, message=None):
+        """
+        Consider an suggestion.
+
+        **Usage**:
+        [p]Consider 5 That's a good idea and may be implemented soon (trademarked).
+        [p]Consider 456 Maybe.
+        """
+        await ctx.message.delete()
+        suggestions = await self.coll.find_one({"_id": "suggestions"})
+        suggestion = suggestions.get(str(suggestion_id), None)
+        if not suggestion:
+            embed = discord.Embed(
+                colour=self.bot.error_color,
+                title=f"Suggestion id #{suggestion_id} not found.",
+                description="Try something else lol.",
+            )
+            return await ctx.send(embed=embed)
+        s_message = None
+        for channel in ctx.guild.channels:
+            if not isinstance(channel, discord.TextChannel):
+                continue
+            try:
+                s_message = await ctx.fetch_message(suggestion["message_id"])
+            except discord.NotFound:
+                continue
+        if not s_message:
+            embed = discord.Embed(
+                colour=self.bot.error_color,
+                title=f"Message not found.",
+                description="Make sure it's not deleted and that I have permissions to access it.",
+            )
+            return await ctx.send(embed=embed)
+        embed = s_message.embeds[0]
+        fields = len(embed.fields)
+        embed.color = discord.Colour(105,105,105)
+        embed.set_author(name=f"Suggestion #{suggestion_id}: Considered")
+        if fields > 2:
+            embed.remove_field(2)
+        if fields == 4:
+            embed.insert_field_at(
+                index=2,
+                name="Response",
+                value=message if message else "No response given.",
+                inline=False,
+            )
+        else:
+            embed.add_field(
+                name="Response",
+                value=message if message else "No response given.",
+                inline=False,
+            )
+        votes = ""
+        for reaction in s_message.reactions:
+            votes += f"{reaction.emoji} **- {reaction.count -1 if reaction.me else reaction.count }**\n"
         if votes:
             embed.add_field(name="Votes", value=votes, inline=False)
         await s_message.edit(embed=embed)
