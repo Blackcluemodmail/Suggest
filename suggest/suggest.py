@@ -41,6 +41,7 @@ class Suggest(commands.Cog):
         **Usage**:
         [p]suggest more plugins!
         """
+        await ctx.message.delete() 
         if str(ctx.author.id) not in self.banlist:
             async with ctx.channel.typing():
                 config = await self.coll.find_one({"_id": "config"})
