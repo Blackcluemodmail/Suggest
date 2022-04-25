@@ -85,7 +85,7 @@ class Suggest(commands.Cog):
                                 discord.utils.get(message.guild.emojis, id=r)
                             )
                             await asyncio.sleep(0.1)
-                    await ctx.send("Successfully submitted suggestion" , delete_after=30)
+                    await ctx.send("Successfully submitted suggestion", delete_after=30)
         else:
             await ctx.send(
                 embed=discord.Embed(
