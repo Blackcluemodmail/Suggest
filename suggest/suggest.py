@@ -256,7 +256,7 @@ class Suggest(commands.Cog):
             return await ctx.send(embed=embed)
         embed = s_message.embeds[0]
         fields = len(embed.fields)
-        embed.color = discord.Colour(105,105,105)
+        embed.color = discord.Color.from_rgb(105,105,105)
         embed.set_author(name=f"Suggestion #{suggestion_id}: Considered")
         if fields > 2:
             embed.remove_field(2)
