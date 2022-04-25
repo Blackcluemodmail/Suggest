@@ -120,7 +120,7 @@ class Suggest(commands.Cog):
             if not isinstance(channel, discord.TextChannel):
                 continue
             try:
-                s_message = await channel.fetch_message(suggestion["message_id"])
+                s_message = await ctx.fetch_message(suggestion["message_id"])
             except discord.NotFound:
                 continue
         if not s_message:
