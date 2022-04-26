@@ -122,7 +122,7 @@ class Suggest(commands.Cog):
                 continue
             try:
                 s_message = await channel.fetch_message(suggestion["message_id"])
-            except discord.NotFound, discord.Forbidden:
+            except discord.Forbidden:
                 continue
         if not s_message:
             embed = discord.Embed(
