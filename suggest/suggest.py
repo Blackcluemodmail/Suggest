@@ -121,7 +121,11 @@ class Suggest(commands.Cog):
             if not isinstance(channel, discord.TextChannel):
                 continue
             try:
-                s_message = await channel.fetch_message(suggestion["message_id"])
+                config = await self.coll.find_one({"_id": "config"})
+                s_channel = self.bot.get_channel(
+                    int(config["suggestion-channel"]["channel"])
+                )
+                s_message = await s_channel.fetch_message(suggestion["message_id"])
             except discord.Forbidden:
                 continue
         if not s_message:
