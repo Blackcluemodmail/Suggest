@@ -122,7 +122,7 @@ class Suggest(commands.Cog):
                 continue
             try:
                 channel = self.bot.get_channel(
-                        int(config["suggestion-channel"]["channel"])
+                        int(["suggestion-channel"]["channel"])
                     )
                 s_message = await channel.fetch_message(suggestion["message_id"])
             except discord.NotFound:
